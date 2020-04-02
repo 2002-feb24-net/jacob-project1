@@ -29,6 +29,7 @@ steps:
   displayName: dotnet test
 
 - task: DotNetCoreCLI@2
+  workingDirectory: Project1.WebUI/
   inputs:
     command: publish
     publishWebProjects: True
@@ -36,6 +37,7 @@ steps:
     zipAfterPublish: True
 
 - task: AzureWebApp@1
+  workingDirectory: Project1.WebUI/
   inputs:
     azureSubscription: 'AzureAppDeploy'
     appName: 'Project1Koch'
