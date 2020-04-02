@@ -20,7 +20,6 @@ steps:
 - script: echo Hello, world!
   displayName: 'Print hello word'
 
-- script: |
-    echo "Showing current directory contents"
-    ls
-  displayName: 'Show directory contents'
+- script: dotnet build
+  workingDirectory: Project1.WebUI/
+  displayName: dotnet build
