@@ -27,10 +27,3 @@ steps:
 - script: dotnet test
   workingDirectory: Project1.WebUI/
   displayName: dotnet test
-
-- task: AzureWebApp@1
-  displayName: 'Azure App Service Deploy: website'
-  inputs:
-    azureSubscription: 'Connection to Azure App Service'
-    appName: 'restaurant-reviews-koch'
-    package: $(System.ArtifactsDirectory)/**/*.zip   
