@@ -23,3 +23,7 @@ steps:
 - script: dotnet build
   workingDirectory: Project1.WebUI/
   displayName: dotnet build
+
+- script: dotnet test
+  workingDirectory: Project1.WebUI/
+  displayName: dotnet test
