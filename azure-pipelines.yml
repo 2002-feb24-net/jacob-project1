@@ -1,0 +1,26 @@
+# this file defines a set of jobs that will run when triggered on a cloned version of your repo
+# a job is a set of steps
+# by default, theres just one job and you give it its list of steps
+
+# by default, all branches get built
+# but adding a trigger configuration like this says "only build master branch"
+trigger:
+- master
+
+# a pool is a set of machines for running this job
+# this configuration says: "use Microsoft's hosted Ubuntu Linux virtual machines"
+# (we could, if we wanted, have it connect to a machine WE control to run the job on)
+pool:
+  vmImage: 'ubuntu-latest'
+
+# the steps in the job
+# "script" is one kind of step - on linux itll run in bash
+# give all steps a good display name
+steps:
+- script: echo Hello, world!
+  displayName: 'Print hello word'
+
+- script: |
+    echo "Showing current directory contents"
+    ls
+  displayName: 'Show directory contents'
