@@ -1,0 +1,9 @@
+bin/
+obj/
+.vs/
+PublishProfiles/
+SecretConfiguration.cs/
+<<<<<<< HEAD
+=======
+appsettings.json/
+>>>>>>> 5235e5b69012f98bca35875ad045626b4a8db88d
