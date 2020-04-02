@@ -29,6 +29,7 @@ steps:
   displayName: dotnet test
 
 - task: AzureWebApp@1
+  displayName: 'Azure App Service Deploy: website'
   inputs:
     azureSubscription: 'Connection to Azure App Service'
     appName: 'restaurant-reviews-koch'
