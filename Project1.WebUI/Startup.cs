@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Project1.DataAccess;
+using Project1.Domain.Interfaces;
 using Project1.Domain.Model;
 
 namespace Project1.WebUI
@@ -29,7 +30,7 @@ namespace Project1.WebUI
             services.AddDbContext<Project1Context>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("Project1String")));
 
-            services.AddScoped<Project1Repository>();
+            services.AddScoped<IProject1Repository, Project1Repository>();
 
             services.AddControllersWithViews();
         }

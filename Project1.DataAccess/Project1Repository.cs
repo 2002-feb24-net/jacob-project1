@@ -175,7 +175,7 @@ namespace Project1.DataAccess
             IQueryable<Product> items = _dbContext.Product;
             if (search != null)
             {
-                items = items.Where(r => r.Id == Int32.Parse(search));
+                items = items.Include(o => o.Orders).Where(r => r.Id == Int32.Parse(search));
             }
             return items.Select(Mapper.Map);
         }
@@ -183,7 +183,7 @@ namespace Project1.DataAccess
         //get Product by id
         public Product GetProductById(int id)
         {
-            return Mapper.Map(_dbContext.Product.Find(id));
+            return Mapper.Map(_dbContext.Product.Include(o => o.Orders).First(p => p.Id == id));
         }
 
         //Add a Product
@@ -212,7 +212,7 @@ namespace Project1.DataAccess
         public void UpdateProduct(Product product)
         {
             s_logger.Info($"Updating Product with ID {product.Id}");
-            Product currentEntity = _dbContext.Product.Find(product.Id);
+            Product currentEntity = _dbContext.Product.Include(o => o.Orders).First(p=>p.Id == product.Id);
             Product newEntity = Mapper.Map(product);
             //This marks only the changed properties as modified
 

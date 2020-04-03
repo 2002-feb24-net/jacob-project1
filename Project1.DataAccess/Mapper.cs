@@ -51,7 +51,8 @@ namespace Project1.DataAccess
                 StoreLocationId = product.StoreLocationId,
                 Name = product.Name,
                 Price = product.Price,
-                Stock = product.Stock
+                Stock = product.Stock,
+                Orders = product.Orders.Select(Map).ToList()
             };
         }
     }
