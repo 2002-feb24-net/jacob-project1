@@ -17,28 +17,41 @@ pool:
 # "script" is one kind of step - on linux itll run in bash
 # give all steps a good display name
 steps:
-- script: echo Hello, world!
-  displayName: 'Print hello word'
-
 - script: dotnet build
   workingDirectory: Project1.WebUI/
   displayName: dotnet build
 
-- script: dotnet test
+# we can publish test results to azure pipeline
+# have the build agent (the machine running the steps)
+# notify azure pipelines of that useful info to keep alongside the build logs
+
+# apart from script, there's also "task" steps
+# a task step implements common build operations that would be clumsy to write out by hand
+
+#- script: dotnet test <test-project> --logger trx
+#  workingDirectory: Project1.WebUI/
+#  continueOnError: true
+#  displayName: dotnet test
+
+- script: dotnet test <test-project> --logger trx
   workingDirectory: Project1.WebUI/
   displayName: dotnet test
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
 
 - task: DotNetCoreCLI@2
   inputs:
-    workingDirectory: Project1.WebUI/
-    command: publish
-    publishWebProjects: True
-    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-    zipAfterPublish: True
+    command: 'publish'
+    publishWebProjects: true
 
-- task: AzureWebApp@1
+#this task looks for a zip file and deploys it to the app service
+- task: AzureRmWebAppDeployment@4
   inputs:
-    workingDirectory: Project1.WebUI/
-    azureSubscription: 'AzureAppDeploy'
-    appName: 'Project1Koch'
-    package: $(System.ArtifactsDirectory)/**/*.zip 
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'Azure subscription 1 (750ddbda-b710-43de-9ec8-b03ede22e082)'
+    appType: 'webApp'
+    WebAppName: 'Project1Koch'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
