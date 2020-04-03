@@ -24,9 +24,17 @@ namespace Project1.WebUI.Controllers
         }
 
         // GET: Customers
-        public async Task<IActionResult> Index()
+        public ActionResult Index([FromQuery]string[] search = null)
         {
-            return View(await _context.Customer.ToListAsync());
+            IEnumerable<Customer> customers = Repo.GetCustomers(search);
+            IEnumerable<CustomerViewModel> customerModels = customers.Select(c => new CustomerViewModel
+            {
+                Id = c.Id,
+                FirstName = c.FirstName,
+                LastName = c.LastName,
+                Orders = c.Orders.Select(x => new OrderViewModel())
+            });
+            return View(customerModels);
         }
 
         // GET: Customers/Details/5

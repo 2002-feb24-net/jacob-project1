@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project1.DataAccess", "..\P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project1.Domain", "..\Project1.Domain\Project1.Domain.csproj", "{E13EA5F8-6DE9-4A8E-BC65-0304DEE73DBC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project1.Tests", "..\Project1.Tests\Project1.Tests.csproj", "{2AB952B9-677F-426A-85D3-FEB33CA60746}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project1.Tests", "..\Project1.Tests\Project1.Tests.csproj", "{2AB952B9-677F-426A-85D3-FEB33CA60746}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{361CB295-845F-4ECC-BD36-C37EA9666FF1}"
+	ProjectSection(SolutionItems) = preProject
+		YML NOTES.txt = YML NOTES.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

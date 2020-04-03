@@ -24,7 +24,7 @@ namespace Project1.Domain.Model
         {
             modelBuilder.Entity<Customer>(entity =>
             {
-                entity.ToTable("Customer", "P0");
+                entity.ToTable("Customer", "P1");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
@@ -39,7 +39,7 @@ namespace Project1.Domain.Model
 
             modelBuilder.Entity<Orders>(entity =>
             {
-                entity.ToTable("Orders", "P0");
+                entity.ToTable("Orders", "P1");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
@@ -75,7 +75,7 @@ namespace Project1.Domain.Model
 
             modelBuilder.Entity<Product>(entity =>
             {
-                entity.ToTable("Product", "P0");
+                entity.ToTable("Product", "P1");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
@@ -96,7 +96,7 @@ namespace Project1.Domain.Model
 
             modelBuilder.Entity<StoreLocation>(entity =>
             {
-                entity.ToTable("StoreLocation", "P0");
+                entity.ToTable("StoreLocation", "P1");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 

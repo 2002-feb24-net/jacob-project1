@@ -77,7 +77,7 @@ namespace Project1.DataAccess
                 .Include(r => r.Orders).AsNoTracking();
             if (search != null)
             {
-                items = items.Include(o => o.Orders).Where(r => r.FirstName.Contains(search[0]) && r.LastName.Contains(search[1]));
+                items = items.Include(o => o.Orders).Where(r => r.FirstName == search[0] && r.LastName == search[1]);
             }
             return items.Select(Mapper.MapCustomerWithOrders);
         }
