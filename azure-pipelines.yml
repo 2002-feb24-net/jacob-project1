@@ -33,7 +33,7 @@ steps:
 #  continueOnError: true
 #  displayName: dotnet test
 
-- script: dotnet test <test-project> --logger trx
+- script: dotnet test --logger trx
   workingDirectory: Project1.WebUI/
   displayName: dotnet test
 - task: PublishTestResults@2
@@ -43,6 +43,7 @@ steps:
     testResultsFiles: '**/*.trx'
 
 - task: DotNetCoreCLI@2
+  displayName: dotnet test
   inputs:
     command: 'publish'
     publishWebProjects: true
