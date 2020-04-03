@@ -57,3 +57,5 @@ steps:
     appType: 'webApp'
     WebAppName: 'Project1Koch'
     packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+
+    
