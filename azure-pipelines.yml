@@ -1,79 +1,143 @@
-# this file defines a set of jobs that will run when triggered on a cloned version of your repo
-# a job is a set of steps
-# by default, theres just one job and you give it its list of steps
-
-# by default, all branches get built
-# but adding a trigger configuration like this says "only build master branch"
 trigger:
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - README.md
+
+pr:
 - master
 
-# a pool is a set of machines for running this job
-# this configuration says: "use Microsoft's hosted Ubuntu Linux virtual machines"
-# (we could, if we wanted, have it connect to a machine WE control to run the job on)
-pool:
-  vmImage: 'ubuntu-latest'
+stages:
 
+- stage: build
+  displayName: build
 
-# the steps in the job
-# "script" is one kind of step - on linux itll run in bash
-# give all steps a good display name
-steps:
+  variables:
+    sdkVersion: 3.1.x
+    solutionPath: .
+    buildConfiguration: Release
 
-- task: SonarCloudPrepare@1
-  inputs:
-    SonarCloud: 'sonarcloud-jacob'
-    organization: '2002-feb24-net'
-    scannerMode: 'MSBuild'
-    projectKey: '2002-feb24-net_jacob-project1'
-    projectName: 'jacob-project1'
+  jobs:
 
-- script: dotnet build
-  workingDirectory: Project1.WebUI/
-  displayName: dotnet build
+  - job: build
+    displayName: build
 
+    pool:
+      vmImage: ubuntu-latest
 
+    steps:
 
-# we can publish test results to azure pipeline
-# have the build agent (the machine running the steps)
-# notify azure pipelines of that useful info to keep alongside the build logs
+    - task: UseDotNet@2
+      inputs:
+        packageType: sdk
+        version: $(sdkVersion)
+      displayName: dotnet $(sdkVersion)
 
-# apart from script, there's also "task" steps
-# a task step implements common build operations that would be clumsy to write out by hand
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: publish
+        publishWebProjects: true
+        arguments:
+          --configuration $(buildConfiguration)
+          --output $(Build.ArtifactStagingDirectory)/publish
+        modifyOutputPath: false
+        zipAfterPublish: false
+      displayName: dotnet publish
 
-#- script: dotnet test <test-project> --logger trx
-#  workingDirectory: Project1.WebUI/
-#  continueOnError: true
-#  displayName: dotnet test
+    - publish: $(Build.ArtifactStagingDirectory)/publish
+      artifact: app
+      displayName: artifact publish app
 
-- script: dotnet test --logger trx
-  workingDirectory: Project1.WebUI/
-  displayName: dotnet test
+  - job: test
+    displayName: test and coverage
 
-- task: SonarCloudAnalyze@1
-  displayName: sonarcloud analysis run
+    pool:
+      vmImage: ubuntu-latest
 
-- task: SonarCloudPublish@1
-  displayName: result
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
-  inputs:
-    testRunner: VSTest
-    testResultsFiles: '**/*.trx'
+    steps:
 
-- task: DotNetCoreCLI@2
-  displayName: dotnet publish
-  inputs:
-    command: 'publish'
-    publishWebProjects: true
+    - task: SonarCloudPrepare@1
+      inputs:
+        SonarCloud: sonarcloud-jacob
+        organization: 2002-feb24-net
+        scannerMode: MSBuild
+        projectKey: 2002-feb24-net_jacob-project1
+        projectName: 'jacob-project1'
+        extraProperties: |
+          sonar.exclusions=**/lib/**
+      displayName: sonarcloud analysis prepare
 
-#this task looks for a zip file and deploys it to the app service
-- task: AzureRmWebAppDeployment@4
-  displayName: Azure Deploy
-  inputs:
-    ConnectionType: 'AzureRM'
-    azureSubscription: 'Azure subscription 1 (750ddbda-b710-43de-9ec8-b03ede22e082)'
-    appType: 'webApp'
-    WebAppName: 'Project1Koch'
-    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    - task: UseDotNet@2
+      inputs:
+        packageType: sdk
+        version: $(sdkVersion)
+      displayName: dotnet $(sdkVersion)
 
+    - script: dotnet build $(solutionPath)
+        --configuration $(buildConfiguration)
+      displayName: dotnet build
+
+    - script: dotnet test $(solutionPath)
+        --configuration $(buildConfiguration)
+        --collect "XPlat Code Coverage"
+        --logger trx
+        --no-build
+        --results-directory $(Common.TestResultsDirectory)
+      continueOnError: true
+      displayName: dotnet test
+
+    - task: SonarCloudAnalyze@1
+      displayName: sonarcloud analysis run
+
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
+      inputs:
+        testRunner: VSTest
+        testResultsFiles: $(Common.TestResultsDirectory)/*.trx
+      displayName: test results build publish
+
+    - task: PublishCodeCoverageResults@1
+      condition: succeededOrFailed()
+      inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: $(Common.TestResultsDirectory)/*/coverage.cobertura.xml
+      displayName: code coverage build publish
     
+    - task: SonarCloudPublish@1
+      condition: succeededOrFailed()
+      displayName: sonarcloud results build publish
+
+- stage: deploy
+  displayName: deploy
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  dependsOn: build
+
+  jobs:
+
+  - deployment: deploy_dev
+    displayName: deploy dev
+
+    pool:
+      vmImage: ubuntu-latest
+
+    environment: dev
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+
+          - download: current
+            artifact: app
+            displayName: artifact download app
+          
+          - task: AzureRmWebAppDeployment@4
+            inputs:
+              ConnectionType: 'AzureRM'
+              azureSubscription: 'Azure subscription 1 (750ddbda-b710-43de-9ec8-b03ede22e082)'
+              appType: 'webApp'
+              WebAppName: 'Project1Koch'
+              packageForLinux: $(Pipeline.Workspace)/app
+            displayName: azure app service deploy
