@@ -12,10 +12,9 @@ namespace Project1.WebUI.ViewModels
         public int StoreLocationId { get; set; }
 
         public int CustomerId { get; set; }
-        [Required]
+
         public int ProductId { get; set; }
         [Required]
-        [DisplayFormat(DataFormatString = "{0:#.##}")]
         public byte[] OrderTime { get; set; }
         [Required]
         public int Quantity { get; set; }
