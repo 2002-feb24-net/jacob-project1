@@ -13,13 +13,25 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+
 # the steps in the job
 # "script" is one kind of step - on linux itll run in bash
 # give all steps a good display name
 steps:
+
+- task: SonarCloudPrepare@1
+  inputs:
+    SonarCloud: 'sonarcloud-jacob'
+    organization: '2002-feb24-net'
+    scannerMode: 'MSBuild'
+    projectKey: '2002-feb24-net_jacob-project1'
+    projectName: 'jacob-project1'
+
 - script: dotnet build
   workingDirectory: Project1.WebUI/
   displayName: dotnet build
+
+
 
 # we can publish test results to azure pipeline
 # have the build agent (the machine running the steps)
@@ -36,6 +48,12 @@ steps:
 - script: dotnet test --logger trx
   workingDirectory: Project1.WebUI/
   displayName: dotnet test
+
+- task: SonarCloudAnalyze@1
+  displayName: sonarcloud analysis run
+
+- task: SonarCloudPublish@1
+  displayName: result
 - task: PublishTestResults@2
   condition: succeededOrFailed()
   inputs:
