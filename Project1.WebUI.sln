@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29905.134
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project1.WebUI", "Project1.WebUI.csproj", "{954A84E8-A82A-4D7E-B36F-4FC6630F306B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project1.WebUI", "Project1.WebUI\Project1.WebUI.csproj", "{954A84E8-A82A-4D7E-B36F-4FC6630F306B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project1.DataAccess", "..\Project1.DataAccess\Project1.DataAccess.csproj", "{70B747BA-A9F2-4F54-A639-4DB149668A79}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project1.DataAccess", "Project1.DataAccess\Project1.DataAccess.csproj", "{70B747BA-A9F2-4F54-A639-4DB149668A79}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project1.Domain", "..\Project1.Domain\Project1.Domain.csproj", "{E13EA5F8-6DE9-4A8E-BC65-0304DEE73DBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project1.Domain", "Project1.Domain\Project1.Domain.csproj", "{E13EA5F8-6DE9-4A8E-BC65-0304DEE73DBC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project1.Tests", "..\Project1.Tests\Project1.Tests.csproj", "{2AB952B9-677F-426A-85D3-FEB33CA60746}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project1.Tests", "Project1.Tests\Project1.Tests.csproj", "{2AB952B9-677F-426A-85D3-FEB33CA60746}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{361CB295-845F-4ECC-BD36-C37EA9666FF1}"
 	ProjectSection(SolutionItems) = preProject
-		YML NOTES.txt = YML NOTES.txt
+		Project1.WebUI\YML NOTES.txt = Project1.WebUI\YML NOTES.txt
 	EndProjectSection
 EndProject
 Global

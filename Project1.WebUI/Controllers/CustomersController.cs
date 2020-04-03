@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Project1.Domain.Model;
 using Project1.Domain.Interfaces;
 using Project1.WebUI.ViewModels;
@@ -15,7 +12,6 @@ namespace Project1.WebUI.Controllers
 {
     public class CustomersController : Controller
     {
-        private readonly Project1Context _context;
 
         public IProject1Repository Repo { get; }
         public CustomersController(IProject1Repository repo)
@@ -24,7 +20,7 @@ namespace Project1.WebUI.Controllers
         }
 
         // GET: Customers
-        public ActionResult Index([FromQuery]string[] search = null)
+        public ActionResult Index([FromQuery]string search = null)
         {
             IEnumerable<Customer> customers = Repo.GetCustomers(search);
             IEnumerable<CustomerViewModel> customerModels = customers.Select(c => new CustomerViewModel

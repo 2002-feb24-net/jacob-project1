@@ -22,7 +22,7 @@ namespace Project1.Domain.Interfaces
         void UpdateLocation(StoreLocation storeLocation);
 
         //Get all customers
-        IEnumerable<Customer> GetCustomers(string[] search = null);
+        IEnumerable<Customer> GetCustomers(string search = null);
 
         //Get a customer by id
         Customer GetCustomerById(int id);

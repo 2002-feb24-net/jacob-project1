@@ -71,13 +71,14 @@ namespace Project1.DataAccess
         }
 
         //Returns collection of Customers
-        public IEnumerable<Customer> GetCustomers(string[] search = null)
+        public IEnumerable<Customer> GetCustomers(string search = null)
         {
             IQueryable<Customer> items = _dbContext.Customer
                 .Include(r => r.Orders).AsNoTracking();
             if (search != null)
             {
-                items = items.Include(o => o.Orders).Where(r => r.FirstName == search[0] && r.LastName == search[1]);
+                string[] temp = search.Split(' ');
+                items = items.Include(o => o.Orders).Where(r => r.FirstName == temp[0] && r.LastName == temp[1]);
             }
             return items.Select(Mapper.MapCustomerWithOrders);
         }
