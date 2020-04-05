@@ -1,0 +1,17 @@
+﻿@model Project1.WebUI.ViewModels.CustomerViewModel
+
+@{
+    ViewData["Title"] = "Customer";
+}
+
+<h1>Customers</h1>
+<div>
+    <div>
+        <a class="btn btn-primary" asp-area="" asp-controller="Product" asp-action="Create">Create Products</a>
+        <a class="btn btn-primary" asp-area="" asp-controller="Product" asp-action="Index">Display Products</a>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

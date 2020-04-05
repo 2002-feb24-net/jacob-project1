@@ -1,0 +1,20 @@
+﻿@model Project1.WebUI.ViewModels.OrderViewModel
+
+@{
+    ViewData["Title"] = "Order";
+}
+<h1>Orders</h1>
+<hr />
+<div>
+    <div>
+        <a class="btn btn-primary" asp-area="" asp-controller="Order" asp-action="Create">Create Order</a>
+        <a class="btn btn-primary" asp-area="" asp-controller="Order" asp-action="StoreSearch">Display Store Order History</a>
+        <a class="btn btn-primary" asp-area="" asp-controller="Order" asp-action="CustomerSearch">Display Customer Order History</a>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

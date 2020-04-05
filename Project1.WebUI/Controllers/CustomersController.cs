@@ -19,6 +19,10 @@ namespace Project1.WebUI.Controllers
             Repo = repo ?? throw new ArgumentNullException(nameof(repo));
         }
 
+        public ActionResult Home()
+        {
+            return View();
+        }
         // GET: Customers
         public ActionResult Index([FromQuery]string search = null)
         {
@@ -163,6 +167,24 @@ namespace Project1.WebUI.Controllers
             {
                 return View();
             }
+        }
+
+        public ActionResult Search()
+        {
+            return View();
+        }
+
+        public ActionResult SearchFound(string fullName)
+        {
+            IEnumerable<Customer> customers = Repo.GetCustomers(fullName);
+            IEnumerable<CustomerViewModel> customerModels = customers.Select(c => new CustomerViewModel
+            {
+                Id = c.Id,
+                FirstName = c.FirstName,
+                LastName = c.LastName,
+                Orders = c.Orders.Select(x => new OrderViewModel())
+            });
+            return View(customerModels);
         }
     }
 }

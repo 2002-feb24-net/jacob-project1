@@ -77,8 +77,7 @@ namespace Project1.DataAccess
                 .Include(r => r.Orders).AsNoTracking();
             if (search != null)
             {
-                string[] temp = search.Split(' ');
-                items = items.Include(o => o.Orders).Where(r => r.FirstName == temp[0] && r.LastName == temp[1]);
+                items = items.Include(o => o.Orders).Where(r => r.FirstName == search || r.LastName == search || r.FirstName+" "+r.LastName == search);
             }
             return items.Select(Mapper.MapCustomerWithOrders);
         }
@@ -124,7 +123,7 @@ namespace Project1.DataAccess
         //Returns collection of Orders
         public IEnumerable<Orders> GetOrders(string search = null)
         {
-            IQueryable<Orders> items = _dbContext.Orders;
+            IQueryable<Orders> items = _dbContext.Orders.Include(o=>o.Customer).Include(o=>o.StoreLocation).Include(o=>o.Product);
             if (search != null)
             {
                 items = items.Where(r => r.Id == Int32.Parse(search));

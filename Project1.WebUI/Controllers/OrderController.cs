@@ -1,57 +1,97 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Project1.Domain.Model;
+using Project1.Domain.Interfaces;
+using Project1.WebUI.ViewModels;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Project1.WebUI.Controllers
 {
     public class OrderController : Controller
     {
-        private readonly Project1Context _context;
+        public IProject1Repository Repo { get; }
 
-        public OrderController(Project1Context context)
+        public OrderController(IProject1Repository repo)
         {
-            _context = context;
+            Repo = repo ?? throw new ArgumentNullException(nameof(repo));
+        }
+        public ActionResult StoreSearch()
+        {
+            return View();
+        }
+        public ActionResult CustomerSearch()
+        {
+            return View();
+        }
+        // GET: Order
+        public ActionResult IndexStore([FromQuery]string search = null)
+        {
+            var storeLocations = Repo.GetLocations(search).First();
+            IEnumerable<Orders> orders = Repo.GetOrders().Where(o=>o.StoreLocationId == storeLocations.Id);
+            IEnumerable<OrderViewModel> orderModels = orders.Select(c => new OrderViewModel
+            {
+                Id = c.Id,
+                ProductId = c.ProductId,
+                StoreLocationId = c.StoreLocationId,
+                CustomerId = c.CustomerId,
+                OrderTime = c.OrderTime,
+                Quantity = c.Quantity
+            });
+            return View(orderModels);
         }
 
-        // GET: Order
-        public async Task<IActionResult> Index()
+        public ActionResult IndexCustomer([FromQuery]string search = null)
         {
-            var project1Context = _context.Orders.Include(o => o.Customer).Include(o => o.Product).Include(o => o.StoreLocation);
-            return View(await project1Context.ToListAsync());
+            var customer = Repo.GetCustomers(search).First();
+            IEnumerable<Orders> orders = Repo.GetOrders().Where(o => o.CustomerId == customer.Id);
+            IEnumerable<OrderViewModel> orderModels = orders.Select(c => new OrderViewModel
+            {
+                Id = c.Id,
+                ProductId = c.ProductId,
+                StoreLocationId = c.StoreLocationId,
+                CustomerId = c.CustomerId,
+                OrderTime = c.OrderTime,
+                Quantity = c.Quantity
+            });
+            return View(orderModels);
+        }
+
+        public ActionResult Home()
+        {
+            return View();
         }
 
         // GET: Order/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public ActionResult Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            Orders orders = Repo.GetOrderById(id);
 
-            var orders = await _context.Orders
-                .Include(o => o.Customer)
-                .Include(o => o.Product)
-                .Include(o => o.StoreLocation)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var orderModel = new OrderViewModel
+            {
+                Id = orders.Id,
+                ProductId = orders.ProductId,
+                StoreLocationId = orders.StoreLocationId,
+                CustomerId = orders.CustomerId,
+                OrderTime = orders.OrderTime,
+                Quantity = orders.Quantity
+            };
             if (orders == null)
             {
                 return NotFound();
             }
-
-            return View(orders);
+            return View(orderModel);
         }
 
         // GET: Order/Create
-        public IActionResult Create()
+        public ActionResult Create()
         {
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "Id", "FirstName");
-            ViewData["ProductId"] = new SelectList(_context.Product, "Id", "Name");
-            ViewData["StoreLocationId"] = new SelectList(_context.StoreLocation, "Id", "LocationName");
+            ViewData["CustomerId"] = new SelectList(Repo.GetCustomers(), "Id", "FirstName");
+            ViewData["ProductId"] = new SelectList(Repo.GetProducts(), "Id", "Name");
+            ViewData["StoreLocationId"] = new SelectList(Repo.GetLocations(), "Id", "LocationName");
             return View();
         }
 
@@ -60,37 +100,50 @@ namespace Project1.WebUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,StoreLocationId,CustomerId,ProductId,OrderTime,Quantity")] Orders orders)
+        public ActionResult Create([Bind("Id,StoreLocationId,CustomerId,ProductId,OrderTime,Quantity")] OrderViewModel orderModel)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(orders);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (!ModelState.IsValid)
+                {
+                    return View(orderModel);
+                }
+                var orders = new Orders
+                {
+                    ProductId = orderModel.ProductId,
+                    StoreLocationId = orderModel.StoreLocationId,
+                    CustomerId = orderModel.CustomerId,
+                    OrderTime = orderModel.OrderTime,
+                    Quantity = orderModel.Quantity
+                };
+                Repo.AddOrder(orders);
+                Repo.Save();
+
+                return RedirectToAction(nameof(OrderController.Details),
+                    "Order", new { id = orderModel.Id });
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "Id", "FirstName", orders.CustomerId);
-            ViewData["ProductId"] = new SelectList(_context.Product, "Id", "Name", orders.ProductId);
-            ViewData["StoreLocationId"] = new SelectList(_context.StoreLocation, "Id", "LocationName", orders.StoreLocationId);
-            return View(orders);
+            catch
+            {
+                return View(orderModel);
+            }
         }
 
         // GET: Order/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public ActionResult Edit(int id)
         {
-            if (id == null)
+            Orders orders = Repo.GetOrderById(id);
+            var orderModel = new OrderViewModel
             {
-                return NotFound();
-            }
-
-            var orders = await _context.Orders.FindAsync(id);
-            if (orders == null)
-            {
-                return NotFound();
-            }
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "Id", "FirstName", orders.CustomerId);
-            ViewData["ProductId"] = new SelectList(_context.Product, "Id", "Name", orders.ProductId);
-            ViewData["StoreLocationId"] = new SelectList(_context.StoreLocation, "Id", "LocationName", orders.StoreLocationId);
-            return View(orders);
+                ProductId = orders.ProductId,
+                StoreLocationId = orders.StoreLocationId,
+                CustomerId = orders.CustomerId,
+                OrderTime = orders.OrderTime,
+                Quantity = orders.Quantity
+            };
+            ViewData["CustomerId"] = new SelectList(Repo.GetCustomers(), "Id", "FirstName");
+            ViewData["ProductId"] = new SelectList(Repo.GetProducts(), "Id", "Name");
+            ViewData["StoreLocationId"] = new SelectList(Repo.GetLocations(), "Id", "LocationName");
+            return View(orderModel);
         }
 
         // POST: Order/Edit/5
@@ -98,74 +151,66 @@ namespace Project1.WebUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,StoreLocationId,CustomerId,ProductId,OrderTime,Quantity")] Orders orders)
+        public ActionResult Edit(int id, [Bind("Id,StoreLocationId,CustomerId,ProductId,OrderTime,Quantity")] OrderViewModel orderModel)
         {
-            if (id != orders.Id)
+            try
             {
-                return NotFound();
-            }
+                if (ModelState.IsValid)
+                {
+                    Orders orders = Repo.GetOrderById(id);
+                    orders.ProductId = orderModel.ProductId;
+                    orders.StoreLocationId = orders.StoreLocationId;
+                    orders.CustomerId = orderModel.CustomerId;
+                    orders.OrderTime = orderModel.OrderTime;
+                    orders.Quantity = orderModel.Quantity;
+                    Repo.AddOrder(orders);
+                    Repo.Save();
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(orders);
-                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!OrdersExists(orders.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                ViewData["CustomerId"] = new SelectList(Repo.GetCustomers(), "Id", "FirstName");
+                ViewData["ProductId"] = new SelectList(Repo.GetProducts(), "Id", "Name");
+                ViewData["StoreLocationId"] = new SelectList(Repo.GetLocations(), "Id", "LocationName");
+                return View(orderModel);
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "Id", "FirstName", orders.CustomerId);
-            ViewData["ProductId"] = new SelectList(_context.Product, "Id", "Name", orders.ProductId);
-            ViewData["StoreLocationId"] = new SelectList(_context.StoreLocation, "Id", "LocationName", orders.StoreLocationId);
-            return View(orders);
+            catch (Exception)
+            {
+                return View(orderModel);
+            }
         }
 
         // GET: Order/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public ActionResult Delete(int id)
         {
-            if (id == null)
+            Orders orders = Repo.GetOrderById(id);
+            var orderModel = new OrderViewModel
             {
-                return NotFound();
-            }
-
-            var orders = await _context.Orders
-                .Include(o => o.Customer)
-                .Include(o => o.Product)
-                .Include(o => o.StoreLocation)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (orders == null)
-            {
-                return NotFound();
-            }
-
-            return View(orders);
+                Id = orders.Id,
+                ProductId = orders.ProductId,
+                StoreLocationId = orders.StoreLocationId,
+                CustomerId = orders.CustomerId,
+                OrderTime = orders.OrderTime,
+                Quantity = orders.Quantity
+            };
+            return View(orderModel);
         }
 
         // POST: Order/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public ActionResult DeleteConfirmed(int id)
         {
-            var orders = await _context.Orders.FindAsync(id);
-            _context.Orders.Remove(orders);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+            try
+            {
+                Repo.DeleteOrder(id);
+                Repo.Save();
 
-        private bool OrdersExists(int id)
-        {
-            return _context.Orders.Any(e => e.Id == id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
         }
     }
 }
