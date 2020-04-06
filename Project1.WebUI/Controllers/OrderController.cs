@@ -19,6 +19,26 @@ namespace Project1.WebUI.Controllers
         {
             Repo = repo ?? throw new ArgumentNullException(nameof(repo));
         }
+        public ActionResult LogIn()
+        {
+            return View();
+        }
+        public ActionResult LogInConfirmed(string name)
+        {
+            var customers = Repo.GetCustomers();
+            if(customers.Any(c=>c.FirstName+" "+c.LastName == name))
+            {
+                ViewData["Error"] = "";
+                string id = customers.First(c => c.FirstName + " " + c.LastName == name).Id.ToString();
+                HttpContext.Response.Cookies.Append("user_id", id);
+                return RedirectToAction(nameof(Create));
+            }
+            else
+            {
+                ViewData["Error"] = "Invalid Name. Please Try Again.";
+                return RedirectToAction(nameof(LogIn));
+            }
+        }
         public ActionResult StoreSearch()
         {
             IEnumerable<StoreLocation> locations = Repo.GetLocations();
@@ -47,7 +67,7 @@ namespace Project1.WebUI.Controllers
         public ActionResult IndexStore(int search)
         {
             IEnumerable<Orders> order2 = Repo.GetOrders();
-            IEnumerable<Orders> orders = order2.Where(o => o.StoreLocationId == search);
+            IEnumerable<Orders> orders = order2.Where(o => o.StoreLocationId == search && o.CheckOut == true);
             IEnumerable<OrderViewModel> orderModels = orders.Select(c => new OrderViewModel
             {
                 CustomerName = c.Customer.FirstName + " " + c.Customer.LastName,
@@ -67,7 +87,7 @@ namespace Project1.WebUI.Controllers
         {
             //var customer = Repo.GetCustomers(search).First();
             IEnumerable<Orders> order2 = Repo.GetOrders();
-            IEnumerable<Orders> orders = order2.Where(o => o.CustomerId == search);
+            IEnumerable<Orders> orders = order2.Where(o => o.CustomerId == search && o.CheckOut == true);
             IEnumerable<OrderViewModel> orderModels = orders.Select(c => new OrderViewModel
             {
                 CustomerName = c.Customer.FirstName + " " + c.Customer.LastName,
@@ -112,7 +132,8 @@ namespace Project1.WebUI.Controllers
         // GET: Order/Create
         public ActionResult Create()
         {
-            ViewData["CustomerId"] = new SelectList(Repo.GetCustomers(), "Id", "FirstName");
+            //Test this
+            ViewData["CustomerId"] = HttpContext.Request.Cookies["user_id"];
             ViewData["ProductId"] = new SelectList(Repo.GetProducts(), "Id", "Name");
             ViewData["StoreLocationId"] = new SelectList(Repo.GetLocations(), "Id", "LocationName");
             ViewData["DateTime"] = Repo.GetOrders().Last().OrderTime;
@@ -138,7 +159,8 @@ namespace Project1.WebUI.Controllers
                     StoreLocationId = orderModel.StoreLocationId,
                     CustomerId = orderModel.CustomerId,
                     OrderTime = orderModel.OrderTime,
-                    Quantity = orderModel.Quantity
+                    Quantity = orderModel.Quantity,
+                    CheckOut = false
                 };
                 Repo.AddOrder(orders);
                 Repo.Save();

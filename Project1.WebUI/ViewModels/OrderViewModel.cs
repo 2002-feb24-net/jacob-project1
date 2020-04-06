@@ -15,12 +15,14 @@ namespace Project1.WebUI.ViewModels
 
         public int ProductId { get; set; }
 
-        public byte[] OrderTime { get; set; }
+        public string OrderTime { get; set; }
         [Required]
         public int Quantity { get; set; }
 
         public string StoreName { get; set; }
         public string CustomerName { get; set; }
         public string ProductName { get; set; }
+
+        public bool? CheckOut { get; set; }
     }
 }

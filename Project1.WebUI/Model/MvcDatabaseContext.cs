@@ -2,15 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Project1.Domain.Model
+namespace Project1.WebUI.Model
 {
-    public partial class Project1Context : DbContext
+    public partial class MvcDatabaseContext : DbContext
     {
-        public Project1Context()
+        public MvcDatabaseContext()
         {
         }
 
-        public Project1Context(DbContextOptions<Project1Context> options)
+        public MvcDatabaseContext(DbContextOptions<MvcDatabaseContext> options)
             : base(options)
         {
         }
@@ -19,6 +19,15 @@ namespace Project1.Domain.Model
         public virtual DbSet<Orders> Orders { get; set; }
         public virtual DbSet<Product> Product { get; set; }
         public virtual DbSet<StoreLocation> StoreLocation { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseSqlServer("Server=tcp:2002-training-koch.database.windows.net,1433;Initial Catalog=MvcDatabase;Persist Security Info=False;User ID=jacob;Password=Hope4career;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

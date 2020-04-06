@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Project1.Domain.Model
+namespace Project1.WebUI.Model
 {
     public partial class Orders
     {
