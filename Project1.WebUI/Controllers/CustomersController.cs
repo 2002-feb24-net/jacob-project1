@@ -66,7 +66,7 @@ namespace Project1.WebUI.Controllers
                     Quantity = o.Quantity,
                 }),
             };
-            if (customer == null)
+            if (customer.FirstName == null)
             {
                 return NotFound();
             }

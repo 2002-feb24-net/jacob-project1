@@ -37,7 +37,7 @@ namespace Project1.WebUI.Controllers
                 return Redirect("NoLogin");
             }
             var id = Int32.Parse(HttpContext.Request.Cookies["user_id"]);
-            IEnumerable<Orders> orders = Repo.GetOrders().Where(o => o.CheckOut == false && o.CustomerId == id);
+            IEnumerable<Orders> orders = Repo.GetOrders().Where(o => !o.CheckOut && o.CustomerId == id);
             IEnumerable<OrderViewModel> orderModels = orders.Select(c => new OrderViewModel
             {
                 CustomerName = c.Customer.FirstName + " " + c.Customer.LastName,
@@ -64,7 +64,7 @@ namespace Project1.WebUI.Controllers
             Product product;
             try
             {
-                while ((orders = Repo.GetOrders().First(o => o.CheckOut == false && o.CustomerId == id)) != null)
+                while ((orders = Repo.GetOrders().First(o => !o.CheckOut && o.CustomerId == id)) != null)
                 {
                     product = Repo.GetProductById(orders.ProductId);
                     product.Stock = product.Stock - orders.Quantity;

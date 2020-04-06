@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -23,25 +22,6 @@ namespace Project1.WebUI.Controllers
         {
             var project1Context = _context.Product.Include(p => p.StoreLocation);
             return View(await project1Context.ToListAsync());
-        }
-
-        // GET: Product/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Product
-                .Include(p => p.StoreLocation)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
         }
 
         // GET: Product/Create

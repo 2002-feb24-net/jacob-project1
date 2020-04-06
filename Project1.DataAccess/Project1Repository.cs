@@ -7,7 +7,7 @@ using Project1.Domain.Interfaces;
 using Project1.Domain.Model;
 namespace Project1.DataAccess
 {
-    public class Project1Repository : IProject1Repository, IDisposable
+    public class Project1Repository : IProject1Repository
     {
         private readonly Project1Context _dbContext;
 
@@ -245,6 +245,7 @@ namespace Project1.DataAccess
         // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
             Dispose(true);
         }
         #endregion

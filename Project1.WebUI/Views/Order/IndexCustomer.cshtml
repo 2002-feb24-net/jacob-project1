@@ -10,24 +10,24 @@
     <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
+    <caption>Order Table</caption>
     <thead>
         <tr>
-            <th>
+            <th id="OrderTime">
                 @Html.DisplayNameFor(model => model.OrderTime)
             </th>
-            <th>
+            <th id="Quantity">
                 @Html.DisplayNameFor(model => model.Quantity)
             </th>
-            <th>
+            <th id="CustomerName">
                 Customer Name
             </th>
-            <th>
+            <th id="ProductName">
                 Product Name
             </th>
-            <th>
+            <th id="StoreName">
                 Store Name
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>

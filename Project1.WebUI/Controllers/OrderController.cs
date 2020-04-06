@@ -93,7 +93,7 @@ namespace Project1.WebUI.Controllers
         public ActionResult IndexStore(int search)
         {
             IEnumerable<Orders> order2 = Repo.GetOrders();
-            IEnumerable<Orders> orders = order2.Where(o => o.StoreLocationId == search && o.CheckOut == true);
+            IEnumerable<Orders> orders = order2.Where(o => o.StoreLocationId == search && o.CheckOut);
             IEnumerable<OrderViewModel> orderModels = orders.Select(c => new OrderViewModel
             {
                 CustomerName = c.Customer.FirstName + " " + c.Customer.LastName,
@@ -116,9 +116,8 @@ namespace Project1.WebUI.Controllers
         /// <returns>View of order models</returns>
         public ActionResult IndexCustomer(int search)
         {
-            //var customer = Repo.GetCustomers(search).First();
             IEnumerable<Orders> order2 = Repo.GetOrders();
-            IEnumerable<Orders> orders = order2.Where(o => o.CustomerId == search && o.CheckOut == true);
+            IEnumerable<Orders> orders = order2.Where(o => o.CustomerId == search && o.CheckOut);
             IEnumerable<OrderViewModel> orderModels = orders.Select(c => new OrderViewModel
             {
                 CustomerName = c.Customer.FirstName + " " + c.Customer.LastName,
@@ -162,7 +161,7 @@ namespace Project1.WebUI.Controllers
                 OrderTime = orders.OrderTime,
                 Quantity = orders.Quantity
             };
-            if (orders == null)
+            if (orders.Id == 0)
             {
                 return NotFound();
             }
@@ -279,7 +278,7 @@ namespace Project1.WebUI.Controllers
                 {
                     Orders orders = Repo.GetOrderById(id);
                     orders.ProductId = orderModel.ProductId;
-                    orders.StoreLocationId = orders.StoreLocationId;
+                    orders.StoreLocationId = orderModel.StoreLocationId;
                     orders.CustomerId = orderModel.CustomerId;
                     orders.OrderTime = orderModel.OrderTime;
                     orders.Quantity = orderModel.Quantity;

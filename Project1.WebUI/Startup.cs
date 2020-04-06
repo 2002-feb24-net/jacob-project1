@@ -36,11 +36,12 @@ namespace Project1.WebUI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        //Add this to the environment during development app.UseDeveloperExceptionPage();
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                
             }
             else
             {
