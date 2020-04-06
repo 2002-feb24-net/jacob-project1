@@ -13,6 +13,7 @@ namespace Project1.WebUI.Controllers
     {
         public IActionResult Index()
         {
+            HttpContext.Response.Cookies.Append("error", "");
             return View();
         }
 

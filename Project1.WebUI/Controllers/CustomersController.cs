@@ -161,7 +161,7 @@ namespace Project1.WebUI.Controllers
                 Repo.DeleteCustomer(id);
                 Repo.Save();
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
             catch
             {
@@ -185,6 +185,10 @@ namespace Project1.WebUI.Controllers
                 Orders = c.Orders.Select(x => new OrderViewModel())
             });
             return View(customerModels);
+        }
+        public ActionResult LogIn()
+        {
+            return View();
         }
     }
 }

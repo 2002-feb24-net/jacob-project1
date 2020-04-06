@@ -1,6 +1,6 @@
 ﻿@model Project1.WebUI.ViewModels.OrderViewModel
-
-@{
+@using Microsoft.AspNetCore.Http;
+@{ 
     ViewData["Title"] = "Create";
 }
 
@@ -13,16 +13,13 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="StoreLocationId" class="control-label"></label>
+                <label class="control-label">Store Location</label>
                 <select asp-for="StoreLocationId" class="form-control" asp-items="ViewBag.StoreLocationId"></select>
             </div>
             <div class="form-group">
-                <label asp-for="CustomerId" class="control-label"></label>
-                <select asp-for="CustomerId" class="form-control" asp-items="ViewBag.CustomerId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductId" class="control-label"></label>
+                <label class="control-label">Product</label>
                 <select asp-for="ProductId" class="form-control" asp-items="ViewBag.ProductId"></select>
+                @ViewData["error"]
             </div>
             <div class="form-group">
                 <label asp-for="Quantity" class="control-label"></label>

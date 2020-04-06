@@ -40,6 +40,7 @@ namespace Project1.DataAccess
                 ProductId = order.ProductId,
                 OrderTime = order.OrderTime,
                 Quantity = order.Quantity, 
+                CheckOut = order.CheckOut,
                 StoreLocation = order.StoreLocation,
                 Customer = order.Customer,
                 Product = order.Product

@@ -11,7 +11,7 @@ namespace Project1.Domain.Model
         public int ProductId { get; set; }
         public string OrderTime { get; set; }
         public int Quantity { get; set; }
-        public bool? CheckOut { get; set; }
+        public bool CheckOut { get; set; }
 
         public virtual Customer Customer { get; set; }
         public virtual Product Product { get; set; }

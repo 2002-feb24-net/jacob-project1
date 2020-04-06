@@ -28,7 +28,7 @@ namespace Project1.WebUI.Controllers
         {
             if(HttpContext.Request.Cookies["user_id"] == null)
             {
-                return Redirect("Cart/NoLogin");
+                return Redirect("NoLogin");
             }
             var id = Int32.Parse(HttpContext.Request.Cookies["user_id"]);
             IEnumerable<Orders> orders = Repo.GetOrders().Where(o => o.CheckOut == false && o.CustomerId == id);
@@ -48,13 +48,21 @@ namespace Project1.WebUI.Controllers
         }
         public ActionResult CheckedOut()
         {
-            var orders = Repo.GetOrders().Where(o => o.CheckOut == false);
-            foreach (var item in orders)
+            var id = Int32.Parse(HttpContext.Request.Cookies["user_id"]);
+            Orders orders;
+            try
             {
-                item.CheckOut = true;
-                Repo.UpdateOrder(item);
+                while ((orders = Repo.GetOrders().First(o => o.CheckOut == false && o.CustomerId == id)) != null)
+                {
+                    orders.CheckOut = true;
+                    Repo.UpdateOrder(orders);
+                    Repo.Save();
+                }
             }
-            Repo.Save();
+            catch
+            {
+                return View();
+            }
             return View();
         }
 

@@ -19,24 +19,24 @@ namespace Project1.WebUI.Controllers
         {
             Repo = repo ?? throw new ArgumentNullException(nameof(repo));
         }
-        public ActionResult LogIn()
+        public ActionResult Login()
         {
             return View();
         }
-        public ActionResult LogInConfirmed(string name)
+        public ActionResult LoginConfirmed(string name)
         {
             var customers = Repo.GetCustomers();
-            if(customers.Any(c=>c.FirstName+" "+c.LastName == name))
+            if(customers.Any(c=>c.FirstName.Trim(' ')+" "+c.LastName.Trim(' ') == name))
             {
                 ViewData["Error"] = "";
                 string id = customers.First(c => c.FirstName + " " + c.LastName == name).Id.ToString();
                 HttpContext.Response.Cookies.Append("user_id", id);
-                return RedirectToAction(nameof(Create));
+                return RedirectToAction("Create");
             }
             else
             {
                 ViewData["Error"] = "Invalid Name. Please Try Again.";
-                return RedirectToAction(nameof(LogIn));
+                return RedirectToAction("Login");
             }
         }
         public ActionResult StoreSearch()
@@ -132,7 +132,11 @@ namespace Project1.WebUI.Controllers
         // GET: Order/Create
         public ActionResult Create()
         {
-            //Test this
+            ViewData["error"] = HttpContext.Request.Cookies["error"];
+            if (HttpContext.Request.Cookies["user_id"] == null)
+            {
+                return Redirect("LogIn");
+            }
             ViewData["CustomerId"] = HttpContext.Request.Cookies["user_id"];
             ViewData["ProductId"] = new SelectList(Repo.GetProducts(), "Id", "Name");
             ViewData["StoreLocationId"] = new SelectList(Repo.GetLocations(), "Id", "LocationName");
@@ -149,22 +153,29 @@ namespace Project1.WebUI.Controllers
         {
             try
             {
+                var test = Repo.GetProductById(orderModel.ProductId);
                 if (!ModelState.IsValid)
                 {
                     return View(orderModel);
+                }
+                if(test.StoreLocationId != orderModel.StoreLocationId)
+                {
+                    string str = test.Name + " is not available at the selected store.";
+                    HttpContext.Response.Cookies.Append("error", str);
+                    return Redirect("Create");
                 }
                 var orders = new Orders
                 {
                     ProductId = orderModel.ProductId,
                     StoreLocationId = orderModel.StoreLocationId,
-                    CustomerId = orderModel.CustomerId,
+                    CustomerId = Int32.Parse(HttpContext.Request.Cookies["user_id"]),
                     OrderTime = orderModel.OrderTime,
                     Quantity = orderModel.Quantity,
                     CheckOut = false
                 };
                 Repo.AddOrder(orders);
                 Repo.Save();
-
+                HttpContext.Response.Cookies.Append("error", "");
                 return RedirectToAction(nameof(Home));
             }
             catch
@@ -213,7 +224,6 @@ namespace Project1.WebUI.Controllers
 
                     return RedirectToAction(nameof(Index));
                 }
-                ViewData["CustomerId"] = new SelectList(Repo.GetCustomers(), "Id", "FirstName");
                 ViewData["ProductId"] = new SelectList(Repo.GetProducts(), "Id", "Name");
                 ViewData["StoreLocationId"] = new SelectList(Repo.GetLocations(), "Id", "LocationName");
                 return View(orderModel);
@@ -250,7 +260,7 @@ namespace Project1.WebUI.Controllers
                 Repo.DeleteOrder(id);
                 Repo.Save();
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Home");
             }
             catch
             {
