@@ -40,6 +40,9 @@ namespace Project1.DataAccess
                 ProductId = order.ProductId,
                 OrderTime = order.OrderTime,
                 Quantity = order.Quantity, 
+                StoreLocation = order.StoreLocation,
+                Customer = order.Customer,
+                Product = order.Product
             };
         }
         //get the product entity
@@ -49,6 +52,7 @@ namespace Project1.DataAccess
             {
                 Id = product.Id,
                 StoreLocationId = product.StoreLocationId,
+                StoreLocation = product.StoreLocation,
                 Name = product.Name,
                 Price = product.Price,
                 Stock = product.Stock,

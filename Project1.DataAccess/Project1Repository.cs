@@ -123,7 +123,7 @@ namespace Project1.DataAccess
         //Returns collection of Orders
         public IEnumerable<Orders> GetOrders(string search = null)
         {
-            IQueryable<Orders> items = _dbContext.Orders.Include(o=>o.Customer).Include(o=>o.StoreLocation).Include(o=>o.Product);
+            IQueryable<Orders> items = _dbContext.Orders.Include(o=>o.StoreLocation).Include(o => o.Customer).Include(o => o.Product);
             if (search != null)
             {
                 items = items.Where(r => r.Id == Int32.Parse(search));
@@ -134,7 +134,7 @@ namespace Project1.DataAccess
         //get Order by id
         public Orders GetOrderById(int id)
         {
-            return Mapper.Map(_dbContext.Orders.Find(id));
+            return Mapper.Map(_dbContext.Orders.Include(o => o.StoreLocation).Include(o => o.Customer).Include(o => o.Product).First(o=>o.Id == id));
         }
 
         //Add a Order
@@ -155,7 +155,7 @@ namespace Project1.DataAccess
         public void DeleteOrder(int orderId)
         {
             s_logger.Info($"Deleting Order with ID {orderId}");
-            Orders entity = _dbContext.Orders.Find(orderId);
+            Orders entity = _dbContext.Orders.First(c=>c.Id==orderId);
             _dbContext.Remove(entity);
         }
 
@@ -163,7 +163,7 @@ namespace Project1.DataAccess
         public void UpdateOrder(Orders order)
         {
             s_logger.Info($"Updating Order with ID {order.Id}");
-            Orders currentEntity = _dbContext.Orders.Find(order.Id);
+            Orders currentEntity = _dbContext.Orders.Include(o => o.StoreLocation).Include(o => o.Customer).Include(o => o.Product).First(c => c.Id == order.Id);
             Orders newEntity = Mapper.Map(order);
             //This marks only the changed properties as modified
 

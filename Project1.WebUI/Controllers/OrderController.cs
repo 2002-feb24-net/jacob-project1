@@ -21,19 +21,38 @@ namespace Project1.WebUI.Controllers
         }
         public ActionResult StoreSearch()
         {
-            return View();
+            IEnumerable<StoreLocation> locations = Repo.GetLocations();
+            IEnumerable<StoreViewModel> locationModels = locations.Select(c => new StoreViewModel
+            {
+                Id = c.Id,
+                LocationName = c.LocationName,
+                Orders = c.Orders.Select(x => new OrderViewModel()),
+                Product = c.Product.Select(x => new ProductViewModel())
+            });
+            return View(locationModels);
         }
         public ActionResult CustomerSearch()
         {
-            return View();
+            IEnumerable<Customer> customers = Repo.GetCustomers();
+            IEnumerable<CustomerViewModel> customerModels = customers.Select(c => new CustomerViewModel
+            {
+                Id = c.Id,
+                FirstName = c.FirstName,
+                LastName = c.LastName,
+                Orders = c.Orders.Select(x => new OrderViewModel())
+            });
+            return View(customerModels);
         }
         // GET: Order
-        public ActionResult IndexStore([FromQuery]string search = null)
+        public ActionResult IndexStore(int search)
         {
-            var storeLocations = Repo.GetLocations(search).First();
-            IEnumerable<Orders> orders = Repo.GetOrders().Where(o=>o.StoreLocationId == storeLocations.Id);
+            IEnumerable<Orders> order2 = Repo.GetOrders();
+            IEnumerable<Orders> orders = order2.Where(o => o.StoreLocationId == search);
             IEnumerable<OrderViewModel> orderModels = orders.Select(c => new OrderViewModel
             {
+                CustomerName = c.Customer.FirstName + " " + c.Customer.LastName,
+                StoreName = c.StoreLocation.LocationName,
+                ProductName = c.Product.Name,
                 Id = c.Id,
                 ProductId = c.ProductId,
                 StoreLocationId = c.StoreLocationId,
@@ -44,12 +63,16 @@ namespace Project1.WebUI.Controllers
             return View(orderModels);
         }
 
-        public ActionResult IndexCustomer([FromQuery]string search = null)
+        public ActionResult IndexCustomer(int search)
         {
-            var customer = Repo.GetCustomers(search).First();
-            IEnumerable<Orders> orders = Repo.GetOrders().Where(o => o.CustomerId == customer.Id);
+            //var customer = Repo.GetCustomers(search).First();
+            IEnumerable<Orders> order2 = Repo.GetOrders();
+            IEnumerable<Orders> orders = order2.Where(o => o.CustomerId == search);
             IEnumerable<OrderViewModel> orderModels = orders.Select(c => new OrderViewModel
             {
+                CustomerName = c.Customer.FirstName + " " + c.Customer.LastName,
+                StoreName = c.StoreLocation.LocationName,
+                ProductName = c.Product.Name,
                 Id = c.Id,
                 ProductId = c.ProductId,
                 StoreLocationId = c.StoreLocationId,
@@ -92,6 +115,7 @@ namespace Project1.WebUI.Controllers
             ViewData["CustomerId"] = new SelectList(Repo.GetCustomers(), "Id", "FirstName");
             ViewData["ProductId"] = new SelectList(Repo.GetProducts(), "Id", "Name");
             ViewData["StoreLocationId"] = new SelectList(Repo.GetLocations(), "Id", "LocationName");
+            ViewData["DateTime"] = Repo.GetOrders().Last().OrderTime;
             return View();
         }
 
@@ -119,8 +143,7 @@ namespace Project1.WebUI.Controllers
                 Repo.AddOrder(orders);
                 Repo.Save();
 
-                return RedirectToAction(nameof(OrderController.Details),
-                    "Order", new { id = orderModel.Id });
+                return RedirectToAction(nameof(Home));
             }
             catch
             {
