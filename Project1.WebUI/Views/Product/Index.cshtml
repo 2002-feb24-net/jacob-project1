@@ -10,21 +10,21 @@
     <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
+    <caption>Product Table</caption>
     <thead>
         <tr>
-            <th>
+            <th id="ProductName">
                 @Html.DisplayNameFor(model => model.Name)
             </th>
-            <th>
+            <th id="ProductPrice">
                 @Html.DisplayNameFor(model => model.Price)
             </th>
-            <th>
+            <th id="ProductStock">
                 @Html.DisplayNameFor(model => model.Stock)
             </th>
-            <th>
+            <th id="StoreLocation">
                 @Html.DisplayNameFor(model => model.StoreLocation)
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
