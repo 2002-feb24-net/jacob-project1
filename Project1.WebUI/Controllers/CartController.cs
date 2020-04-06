@@ -18,12 +18,18 @@ namespace Project1.WebUI.Controllers
         {
             Repo = repo ?? throw new ArgumentNullException(nameof(repo));
         }
-
+        /// <summary>
+        /// The Home Action for Cart Controller
+        /// </summary>
+        /// <returns>Home view</returns>
         public ActionResult Home()
         {
             return View();
         }
-        // Checkout
+        /// <summary>
+        /// The CheckOut Page that lists the orders based on the customers id and the checkout bool
+        /// </summary>
+        /// <returns>orderModels</returns>
         public ActionResult Index()
         {
             if(HttpContext.Request.Cookies["user_id"] == null)
@@ -46,14 +52,24 @@ namespace Project1.WebUI.Controllers
             });
             return View(orderModels);
         }
+        /// <summary>
+        /// Takes the Orders and updates them to the repo.
+        /// The method also changes the stock of the products based on the quantity of the order.
+        /// </summary>
+        /// <returns>CheckedOut View</returns>
         public ActionResult CheckedOut()
         {
             var id = Int32.Parse(HttpContext.Request.Cookies["user_id"]);
             Orders orders;
+            Product product;
             try
             {
                 while ((orders = Repo.GetOrders().First(o => o.CheckOut == false && o.CustomerId == id)) != null)
                 {
+                    product = Repo.GetProductById(orders.ProductId);
+                    product.Stock = product.Stock - orders.Quantity;
+                    Repo.UpdateProduct(product);
+                    Repo.Save();
                     orders.CheckOut = true;
                     Repo.UpdateOrder(orders);
                     Repo.Save();
@@ -65,7 +81,10 @@ namespace Project1.WebUI.Controllers
             }
             return View();
         }
-
+        /// <summary>
+        /// In case of the Customer not being logged in, The view will switch to a default please log in message.
+        /// </summary>
+        /// <returns>NoLogin view</returns>
         public ActionResult NoLogIn()
         {
             return View();

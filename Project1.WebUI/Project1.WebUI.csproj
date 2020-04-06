@@ -21,6 +21,10 @@
     <ProjectReference Include="..\Project1.Domain\Project1.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\Assets\burger.png" />
+  </ItemGroup>
+
 
 
 </Project>

@@ -19,10 +19,21 @@ namespace Project1.WebUI.Controllers
         {
             Repo = repo ?? throw new ArgumentNullException(nameof(repo));
         }
+        /// <summary>
+        /// Login Action Method that returns the login page.
+        /// Lets the user login based on their full name and saves their user id into their cookies.
+        /// </summary>
+        /// <returns>view</returns>
         public ActionResult Login()
         {
             return View();
         }
+        /// <summary>
+        /// LoginConfirmed action method takes the input from the user and checks if there are any users with the same matching name.
+        /// If it does, then the method saves the user id in the user's cookies and redirects to the create order method.
+        /// </summary>
+        /// <param name="name">The Full name input from the user</param>
+        /// <returns>Redirects to Create or redirects to login on error</returns>
         public ActionResult LoginConfirmed(string name)
         {
             var customers = Repo.GetCustomers();
@@ -39,6 +50,11 @@ namespace Project1.WebUI.Controllers
                 return RedirectToAction("Login");
             }
         }
+        /// <summary>
+        /// Store Search Action Method lets the user search the Database for a store location
+        /// and display its respective order history
+        /// </summary>
+        /// <returns>View of locationModels</returns>
         public ActionResult StoreSearch()
         {
             IEnumerable<StoreLocation> locations = Repo.GetLocations();
@@ -51,6 +67,11 @@ namespace Project1.WebUI.Controllers
             });
             return View(locationModels);
         }
+        /// <summary>
+        /// Customer Search Action Method lets the user search the Database for a customer
+        /// and displays the customers order history.
+        /// </summary>
+        /// <returns>View of customer models</returns>
         public ActionResult CustomerSearch()
         {
             IEnumerable<Customer> customers = Repo.GetCustomers();
@@ -64,6 +85,11 @@ namespace Project1.WebUI.Controllers
             return View(customerModels);
         }
         // GET: Order
+        /// <summary>
+        /// IndexStore gets the order history of the selected store.
+        /// </summary>
+        /// <param name="search">user input of the store id</param>
+        /// <returns>View of order models</returns>
         public ActionResult IndexStore(int search)
         {
             IEnumerable<Orders> order2 = Repo.GetOrders();
@@ -82,7 +108,12 @@ namespace Project1.WebUI.Controllers
             });
             return View(orderModels);
         }
-
+        // GET: Order
+        /// <summary>
+        /// IndexCustomer gets the order history of the selected store.
+        /// </summary>
+        /// <param name="search">User input of the customers id</param>
+        /// <returns>View of order models</returns>
         public ActionResult IndexCustomer(int search)
         {
             //var customer = Repo.GetCustomers(search).First();
@@ -102,13 +133,22 @@ namespace Project1.WebUI.Controllers
             });
             return View(orderModels);
         }
-
+        /// <summary>
+        /// Default Action Method for the Order Controller.
+        /// Sends the User to the home page for Orders
+        /// </summary>
+        /// <returns>Home view</returns>
         public ActionResult Home()
         {
             return View();
         }
 
         // GET: Order/Details/5
+        /// <summary>
+        /// Details Action Method displays the details of an order and its respective attributes based on the order id.
+        /// </summary>
+        /// <param name="id">The Order ID</param>
+        /// <returns>View of an order model</returns>
         public ActionResult Details(int id)
         {
             Orders orders = Repo.GetOrderById(id);
@@ -130,6 +170,10 @@ namespace Project1.WebUI.Controllers
         }
 
         // GET: Order/Create
+        /// <summary>
+        /// The Create Action Method that lets the user create new Order entities.
+        /// </summary>
+        /// <returns>Create View</returns>
         public ActionResult Create()
         {
             ViewData["error"] = HttpContext.Request.Cookies["error"];
@@ -138,15 +182,19 @@ namespace Project1.WebUI.Controllers
                 return Redirect("LogIn");
             }
             ViewData["CustomerId"] = HttpContext.Request.Cookies["user_id"];
-            ViewData["ProductId"] = new SelectList(Repo.GetProducts(), "Id", "Name");
+            ViewData["ProductId"] = new SelectList(Repo.GetProducts(), "Id", "Name", "Stock");
             ViewData["StoreLocationId"] = new SelectList(Repo.GetLocations(), "Id", "LocationName");
             ViewData["DateTime"] = Repo.GetOrders().Last().OrderTime;
             return View();
         }
 
         // POST: Order/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        /// <summary>
+        /// The Create Action Method Overloads with Binds for a OrderViewModel that is added to the database.
+        /// The order has a false checkout bool until the user checksout with the CartController.
+        /// </summary>
+        /// <param name="orderModel">User Input for creating an order</param>
+        /// <returns>Returns to the order home page</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind("Id,StoreLocationId,CustomerId,ProductId,OrderTime,Quantity")] OrderViewModel orderModel)
@@ -161,6 +209,12 @@ namespace Project1.WebUI.Controllers
                 if(test.StoreLocationId != orderModel.StoreLocationId)
                 {
                     string str = test.Name + " is not available at the selected store.";
+                    HttpContext.Response.Cookies.Append("error", str);
+                    return Redirect("Create");
+                }
+                else if(orderModel.Quantity > test.Stock)
+                {
+                    string str = "Quantity entered is too big. There are only " +test.Stock +" "+ test.Name + " left in stock.";
                     HttpContext.Response.Cookies.Append("error", str);
                     return Redirect("Create");
                 }
@@ -185,6 +239,11 @@ namespace Project1.WebUI.Controllers
         }
 
         // GET: Order/Edit/5
+        /// <summary>
+        /// The Edit ActionMethod edits the order based on user input.
+        /// </summary>
+        /// <param name="id">The Order ID</param>
+        /// <returns>View of order model</returns>
         public ActionResult Edit(int id)
         {
             Orders orders = Repo.GetOrderById(id);
@@ -203,8 +262,13 @@ namespace Project1.WebUI.Controllers
         }
 
         // POST: Order/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        /// <summary>
+        /// The Edit Action Method Overload is binding the changes made by the user and saving the changes
+        /// to the repository.
+        /// </summary>
+        /// <param name="id">The Order ID</param>
+        /// <param name="orderModel">The User Input Order Changes</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, [Bind("Id,StoreLocationId,CustomerId,ProductId,OrderTime,Quantity")] OrderViewModel orderModel)
@@ -235,6 +299,11 @@ namespace Project1.WebUI.Controllers
         }
 
         // GET: Order/Delete/5
+        /// <summary>
+        /// The Delete Action Method prompts the user to delete the selected action method.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public ActionResult Delete(int id)
         {
             Orders orders = Repo.GetOrderById(id);
@@ -251,6 +320,11 @@ namespace Project1.WebUI.Controllers
         }
 
         // POST: Order/Delete/5
+        /// <summary>
+        /// The DeleteConfirmed Method tells the user that the deletion is complete and deletes specified order.
+        /// </summary>
+        /// <param name="id">Order ID</param>
+        /// <returns>View of Confirmation</returns>
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)

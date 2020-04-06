@@ -18,7 +18,7 @@
             </div>
             <div class="form-group">
                 <label class="control-label">Product</label>
-                <select asp-for="ProductId" class="form-control" asp-items="ViewBag.ProductId"></select>
+                <select asp-for="ProductId" class="form-control" asp-items="ViewBag.ProductId"> </select>
                 @ViewData["error"]
             </div>
             <div class="form-group">
@@ -31,10 +31,6 @@
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
