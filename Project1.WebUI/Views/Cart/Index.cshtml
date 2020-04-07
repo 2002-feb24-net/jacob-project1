@@ -7,7 +7,7 @@
 <h1>CheckOut</h1>
 
 <table class="table" id="CartTable">
-    <caption>Cart Table</caption>
+    <caption>Cart</caption>
     <thead>
         <tr>
             <th id="OrderTime">
@@ -16,9 +16,12 @@
             <th id="Quantity">
                 @Html.DisplayNameFor(model => model.Quantity)
             </th>
+            <th id="OrderPrice">
+                Order Price
+            </th>
             <th id="CustomerName">
                 Customer Name
-            </thi>
+            </th>
             <th id="ProductName">
                 Product Name
             </th>
@@ -36,6 +39,9 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Quantity)
+                </td>
+                <td>
+                    $ @Html.DisplayFor(modelItem => item.Price)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.CustomerName)

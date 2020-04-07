@@ -181,7 +181,7 @@ namespace Project1.WebUI.Controllers
                 return Redirect("LogIn");
             }
             ViewData["CustomerId"] = HttpContext.Request.Cookies["user_id"];
-            ViewData["ProductId"] = new SelectList(Repo.GetProducts(), "Id", "Name", "Stock");
+            ViewData["ProductId"] = new SelectList(Repo.GetProducts(), "Id", "Name");
             ViewData["StoreLocationId"] = new SelectList(Repo.GetLocations(), "Id", "LocationName");
             ViewData["DateTime"] = Repo.GetOrders().Last().OrderTime;
             return View();

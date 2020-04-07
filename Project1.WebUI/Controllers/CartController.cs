@@ -48,8 +48,10 @@ namespace Project1.WebUI.Controllers
                 StoreLocationId = c.StoreLocationId,
                 CustomerId = c.CustomerId,
                 OrderTime = c.OrderTime,
-                Quantity = c.Quantity
+                Quantity = c.Quantity, 
+                Price = c.Product.Price*c.Quantity
             });
+
             return View(orderModels);
         }
         /// <summary>

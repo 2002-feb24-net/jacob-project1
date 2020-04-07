@@ -222,9 +222,10 @@ namespace Project1.WebUI.Controllers
         /// </summary>
         /// <param name="fullName"></param>
         /// <returns></returns>
-        public ActionResult SearchFound(string fullName)
+        public ActionResult SearchFound(string search)
         {
-            IEnumerable<Customer> customers = Repo.GetCustomers(fullName);
+            IEnumerable<Customer> customers = Repo.GetCustomers(search);
+
             IEnumerable<CustomerViewModel> customerModels = customers.Select(c => new CustomerViewModel
             {
                 Id = c.Id,
